@@ -1,0 +1,29 @@
+{
+  "name": "certisure",
+  "version": "1.0.0",
+  "description": "Secure Certificate Issuance & Authentication Platform --By Team Vitality",
+  "keywords": [
+    "certificate",
+    "verification",
+    "hackathon",
+    "web"
+  ],
+  "homepage": "https://github.com/CodewithHammad08/CertiSure#readme",
+  "bugs": {
+    "url": "https://github.com/CodewithHammad08/CertiSure/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/CodewithHammad08/CertiSure.git"
+  },
+  "license": "ISC",
+  "author": "Team Vitality",
+  "type": "commonjs",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  }
+}
