@@ -19,31 +19,27 @@ export const Result = () => {
     return "Not Detected";
   };
 
-  // Simple regex parsers for demo purposes
+  // Enhanced regex parsers to catch more variations
   const parsedName = extractField(extractedText, [
-    /Name:\s*(.*)/i,
-    /Presented to\s*(.*)/i,
-    /Certifies that\s*(.*)/i,
-    /Candidate:\s*(.*)/i
+    /(?:Name|Student Name|Candidate Name|Awarded to|Presented to|Belongs to)[:\s]+([A-Za-z\s\.]+)/i,
+    /Certifies that\s+([A-Za-z\s\.]+)\s+has/i,
+    /([A-Z][a-z]+ [A-Z][a-z]+)/ // Fallback: looks for Two TitleCase Words if explicit label is missing
   ]);
   
   const parsedId = extractField(extractedText, [
-    /ID:\s*(.*)/i,
-    /Certificate No\.?:\s*(.*)/i,
-    /Ref:\s*(.*)/i
+    /(?:ID|Cert ID|Certificate ID|Certificate No|Ref No|Reference No|Credential ID)[:\s\.#]+([A-Z0-9\-]+)/i,
+    /([A-Z]{3,}-\d{4,})/ // Pattern like CERT-1234
   ]);
 
   const parsedInstitute = extractField(extractedText, [
-    /Institute:\s*(.*)/i,
-    /University:\s*(.*)/i,
-    /College:\s*(.*)/i,
-    /Organization:\s*(.*)/i
+    /(?:Institute|University|College|Academy|Organization|Issued by|Authority)[:\s]+([A-Za-z\s,&]+)/i,
+    /([A-Za-z\s]+University)/i, // Capture "Stanford University" even without label
+    /([A-Za-z\s]+Institute)/i
   ]);
 
   const parsedYear = extractField(extractedText, [
-    /Year:\s*(\d{4})/i,
-    /Date:.*\s(\d{4})/i,
-    /(\d{4})/
+    /(?:Year|Date|Issued|On)[:\s]+.*?(\d{4})/i,
+    /\b(20\d{2})\b/ // Finds any year starting with 20xx
   ]);
 
   // Derived result object - Prioritizing Manual Data

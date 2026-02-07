@@ -72,18 +72,21 @@ export const Verify = () => {
                 setProgress(Math.round(m.progress * 100));
                 setStatusText(`Recognizing Text... ${Math.round(m.progress * 100)}%`);
               } else {
-                setStatusText(m.status);
+                setStatusText(m.status); // e.g., 'loading tesseract core', 'initializing api'
               }
             }
           }
         ).then(({ data: { text } }) => {
+           if (!text || text.trim().length === 0) {
+              throw new Error("No text found in image");
+           }
            navigate('/result', { state: { extractedText: text, fileName: file.name } });
         });
 
       } catch (err) {
-        console.error(err);
-        setStatusText('Error scanning file.');
-        setTimeout(() => setIsScanning(false), 2000);
+        console.error("OCR Error:", err);
+        setStatusText(err.message === "No text found in image" ? "No text detected. Try a clearer image." : "Error scanning file. Please try again.");
+        setTimeout(() => setIsScanning(false), 3000);
       }
     } else {
        // Manual entry - pass the actual data!
