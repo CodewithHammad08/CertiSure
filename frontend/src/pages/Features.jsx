@@ -56,24 +56,24 @@ export const Features = () => {
   ];
 
   return (
-    <div className="min-h-screen pt-24 px-4 sm:px-6 lg:px-8 pb-20">
+    <div className="min-h-screen pt-24 px-4 sm:px-6 lg:px-8 pb-20 gradient-bg">
       <div className="text-center max-w-3xl mx-auto mb-16">
-        <h1 className="text-4xl font-bold mb-4 text-slate-900">Platform Features</h1>
+        <h1 className="font-heading text-4xl font-bold mb-4 text-slate-900">Platform Features</h1>
         <p className="text-slate-600 text-lg">Everything you need to secure your digital future.</p>
       </div>
 
       <div className="max-w-7xl mx-auto grid md:grid-cols-2 lg:grid-cols-3 gap-8">
         {features.map((feature, index) => (
-          <Card key={index} delay={index * 0.05} className="bg-white/50">
-            <div className="mb-4">{feature.icon}</div>
-            <h3 className="text-xl font-bold mb-2 text-slate-900">{feature.title}</h3>
+          <Card key={index} delay={index * 0.05} className="bg-white/80 backdrop-blur-sm border-white/50 hover:bg-white card-shadow">
+            <div className="mb-4 p-3 bg-slate-50 rounded-xl inline-block">{feature.icon}</div>
+            <h3 className="font-heading text-xl font-bold mb-2 text-slate-900">{feature.title}</h3>
             <p className="text-slate-600">{feature.description}</p>
           </Card>
         ))}
       </div>
 
       <div className="text-center mt-20">
-        <h2 className="text-2xl font-bold mb-6 text-slate-900">Ready to experience the future?</h2>
+        <h2 className="font-heading text-2xl font-bold mb-6 text-slate-900">Ready to experience the future?</h2>
         <Button variant="glow" size="lg" onClick={() => window.location.href='/get-started'}>
           Get Started Now
         </Button>

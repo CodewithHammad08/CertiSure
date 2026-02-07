@@ -1,58 +1,130 @@
 import { motion } from 'framer-motion';
-import { ShieldCheck, Lock, ArrowRight } from 'lucide-react';
+import { ShieldCheck, Lock, ArrowRight, Eye, EyeOff, Mail } from 'lucide-react';
 import { Button } from '../components/ui/Button';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { useState } from 'react';
+import { useAuth } from '../context/AuthContext';
 
 export const LoginAdmin = () => {
+  const [showPassword, setShowPassword] = useState(false);
+  const [focusedField, setFocusedField] = useState(null);
+  const { login } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogin = (e) => {
+    e.preventDefault();
+    const email = document.getElementById('email').value;
+    
+    if (email.includes('institute')) {
+       login({ name: 'Institute Admin', email: email, role: 'institute' });
+       navigate('/insight');
+    } else {
+       login({ name: 'System Admin', email: email, role: 'admin' });
+       navigate('/dashboard');
+    }
+  };
+
+  const containerVariants = {
+    hidden: { opacity: 0, scale: 0.95 },
+    visible: { 
+      opacity: 1, 
+      scale: 1,
+      transition: { 
+        duration: 0.5,
+        staggerChildren: 0.1
+      }
+    }
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0 }
+  };
+
   return (
-    <div className="min-h-screen pt-24 px-4 sm:px-6 lg:px-8 pb-20 flex items-center justify-center">
+    <div className="min-h-screen pt-24 px-4 sm:px-6 lg:px-8 pb-20 flex items-center justify-center gradient-bg relative overflow-hidden">
+      {/* Animated Background Elements */}
+      <div className="absolute top-0 left-0 w-full h-full overflow-hidden z-0 pointer-events-none">
+         <div className="absolute bottom-1/4 left-1/3 w-96 h-96 bg-emerald-400/20 rounded-full mix-blend-multiply filter blur-3xl animate-blob"></div>
+         <div className="absolute top-1/4 right-1/4 w-96 h-96 bg-teal-400/20 rounded-full mix-blend-multiply filter blur-3xl animate-blob animation-delay-2000"></div>
+      </div>
+
       <motion.div 
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="w-full max-w-md bg-white border border-slate-200 rounded-2xl shadow-xl p-8 relative overflow-hidden"
-      >
-        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-emerald-500 to-teal-500"></div>
-        
-        <div className="text-center mb-8">
-          <div className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <ShieldCheck className="w-8 h-8 text-emerald-600" />
-          </div>
-          <h1 className="text-2xl font-bold text-slate-900">Admin Portal</h1>
-          <p className="text-slate-600">Secure access for administrators</p>
-        </div>
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+        className="w-full max-w-md bg-white/80 backdrop-blur-xl border border-emerald-100/50 rounded-3xl shadow-2xl p-8 relative z-10"
+      > 
+        <motion.div variants={itemVariants} className="text-center mb-8">
+          <motion.div 
+            whileHover={{ scale: 1.05, rotate: -5 }}
+            className="w-20 h-20 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg shadow-emerald-500/30"
+          >
+            <ShieldCheck className="w-10 h-10 text-white" />
+          </motion.div>
+          <h1 className="font-heading text-3xl font-bold text-slate-900 mb-2">Admin Portal</h1>
+          <p className="text-slate-500">Secure access for administrators</p>
+        </motion.div>
 
-        <form className="space-y-6">
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-2">Admin ID / Email</label>
-            <div className="relative">
-              <ShieldCheck className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-              <input type="email" className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all" placeholder="admin@certisure.com" />
+        <form className="space-y-6" onSubmit={handleLogin}>
+          <motion.div variants={itemVariants}>
+            <label className={`block text-sm font-medium mb-2 transition-colors ${focusedField === 'email' ? 'text-emerald-600' : 'text-slate-700'}`}>Work Email</label>
+            <div className="relative group">
+              <Mail className={`absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 transition-colors ${focusedField === 'email' ? 'text-emerald-500' : 'text-slate-400'}`} />
+              <input 
+                id="email"
+                type="email" 
+                onFocus={() => setFocusedField('email')}
+                onBlur={() => setFocusedField(null)}
+                className="w-full pl-12 pr-4 py-4 bg-white/50 border border-slate-200 rounded-xl focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 outline-none transition-all placeholder:text-slate-400" 
+                placeholder="admin@certisure.com" 
+              />
             </div>
-          </div>
+            <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} delay={1} className="text-xs text-slate-400 mt-2 ml-1">
+               Try <span className="font-mono text-emerald-600 font-bold">institute@edu.com</span> for Insight Demo
+            </motion.p>
+          </motion.div>
           
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-2">Password</label>
-            <div className="relative">
-              <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-              <input type="password" className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all" placeholder="••••••••" />
+          <motion.div variants={itemVariants}>
+            <label className={`block text-sm font-medium mb-2 transition-colors ${focusedField === 'password' ? 'text-emerald-600' : 'text-slate-700'}`}>Password</label>
+            <div className="relative group">
+              <Lock className={`absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 transition-colors ${focusedField === 'password' ? 'text-emerald-500' : 'text-slate-400'}`} />
+              <input 
+                type={showPassword ? "text" : "password"} 
+                onFocus={() => setFocusedField('password')}
+                onBlur={() => setFocusedField(null)}
+                className="w-full pl-12 pr-12 py-4 bg-white/50 border border-slate-200 rounded-xl focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 outline-none transition-all placeholder:text-slate-400" 
+                placeholder="••••••••" 
+              />
+              <button 
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 focus:outline-none transition-colors"
+              >
+                {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+              </button>
             </div>
-          </div>
+          </motion.div>
 
-          <div className="flex items-center justify-between text-sm">
-            <label className="flex items-center gap-2 cursor-pointer">
-              <input type="checkbox" className="rounded border-slate-300 text-emerald-600 focus:ring-emerald-500" />
-              <span className="text-slate-600">Keep me logged in</span>
+          <motion.div variants={itemVariants} className="flex items-center justify-between text-sm">
+            <label className="flex items-center gap-2 cursor-pointer group">
+              <div className="relative flex items-center">
+                 <input type="checkbox" className="peer w-5 h-5 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500 transition-all cursor-pointer" />
+              </div>
+              <span className="text-slate-600 group-hover:text-slate-800 transition-colors">Keep me logged in</span>
             </label>
-          </div>
+          </motion.div>
 
-          <Button variant="secondary" className="w-full justify-center">
-            Access Portal <ArrowRight size={18} />
-          </Button>
+          <motion.div variants={itemVariants} whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+            <Button className="w-full justify-center py-4 bg-gradient-to-r from-emerald-500 to-teal-600 hover:shadow-lg hover:shadow-emerald-500/30 text-lg font-bold border-none rounded-xl transition-all">
+              Access Portal <ArrowRight size={20} className="ml-2" />
+            </Button>
+          </motion.div>
         </form>
 
-        <div className="mt-8 text-center text-sm text-slate-600">
-          <Link to="/get-started" className="text-emerald-600 hover:text-emerald-700 font-medium">Return to Role Selection</Link>
-        </div>
+        <motion.div variants={itemVariants} className="mt-8 text-center text-sm text-slate-600">
+          Don't have an account? <Link to="/register-institute" className="text-emerald-600 hover:text-emerald-700 font-bold hover:underline">Register Institute</Link>
+        </motion.div>
       </motion.div>
     </div>
   );
