@@ -2,12 +2,14 @@ import { motion } from 'framer-motion';
 import { CheckCircle, Download, RotateCcw, FileText, ScanLine } from 'lucide-react';
 import { Button } from '../components/ui/Button';
 import { Card } from '../components/ui/Card';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, useParams } from 'react-router-dom';
+import { useState, useEffect } from 'react';
 
 export const Result = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { extractedText = "", fileName, manualData } = location.state || {};
+  const { id } = useParams();
+  const { extractedText = "", fileName, manualData } = location.state || {}; // Fallback for direct access
 
   // Helper function to extract data from OCR text
   const extractField = (text, patterns) => {
@@ -21,36 +23,75 @@ export const Result = () => {
 
   // Enhanced regex parsers to catch more variations
   const parsedName = extractField(extractedText, [
-    /(?:Name|Student Name|Candidate Name|Awarded to|Presented to|Belongs to)[:\s]+([A-Za-z\s\.]+)/i,
-    /Certifies that\s+([A-Za-z\s\.]+)\s+has/i,
-    /([A-Z][a-z]+ [A-Z][a-z]+)/ // Fallback: looks for Two TitleCase Words if explicit label is missing
+      /(?:Name|Student Name|Candidate Name|Awarded to|Presented to|Belongs to)[:\s]+([A-Za-z\s.]+)/i,
+      /Certifies that\s+([A-Za-z\s.]+)\s+has/i,
+      /([A-Z][a-z]+ [A-Z][a-z]+)/ // Fallback: looks for Two TitleCase Words if explicit label is missing
+  ]);
+    
+  const parsedId = extractField(extractedText, [
+      /(?:ID|Cert ID|Certificate ID|Certificate No|Ref No|Reference No|Credential ID)[:\s.#]+([A-Z0-9-]+)/i,
+      /([A-Z]{3,}-\d{4,})/ // Pattern like CERT-1234
   ]);
   
-  const parsedId = extractField(extractedText, [
-    /(?:ID|Cert ID|Certificate ID|Certificate No|Ref No|Reference No|Credential ID)[:\s\.#]+([A-Z0-9\-]+)/i,
-    /([A-Z]{3,}-\d{4,})/ // Pattern like CERT-1234
-  ]);
-
   const parsedInstitute = extractField(extractedText, [
-    /(?:Institute|University|College|Academy|Organization|Issued by|Authority)[:\s]+([A-Za-z\s,&]+)/i,
-    /([A-Za-z\s]+University)/i, // Capture "Stanford University" even without label
-    /([A-Za-z\s]+Institute)/i
+      /(?:Institute|University|College|Academy|Organization|Issued by|Authority)[:\s]+([A-Za-z\s,&]+)/i,
+      /([A-Za-z\s]+University)/i, // Capture "Stanford University" even without label
+      /([A-Za-z\s]+Institute)/i
   ]);
-
+  
   const parsedYear = extractField(extractedText, [
-    /(?:Year|Date|Issued|On)[:\s]+.*?(\d{4})/i,
-    /\b(20\d{2})\b/ // Finds any year starting with 20xx
+      /(?:Year|Date|Issued|On)[:\s]+.*?(\d{4})/i,
+      /\b(20\d{2})\b/ // Finds any year starting with 20xx
   ]);
 
-  // Derived result object - Prioritizing Manual Data
+  const [verificationResult, setVerificationResult] = useState(null);
+  // eslint-disable-next-line no-unused-vars
+  const [loading, setLoading] = useState(true);
+  // eslint-disable-next-line no-unused-vars
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchCertificate = async () => {
+      // Prioritize ID from URL param, then manual input, then OCR
+      const queryId = id || manualData?.certId || extractField(extractedText, [
+        /(?:ID|Cert ID|Certificate ID|Certificate No|Ref No|Reference No|Credential ID)[:\s.#]+([A-Z0-9-]+)/i,
+        /([A-Z]{3,}-\d{4,})/ 
+      ]);
+
+      if (queryId && queryId !== "Not Detected") {
+        try {
+          const response = await fetch(`${import.meta.env.VITE_API_URL}/certificates/${queryId}`);
+          if (response.ok) {
+            const data = await response.json();
+            setVerificationResult(data);
+          } else {
+             setVerificationResult(null);
+          }
+        } catch (err) {
+          console.error("Verification check failed", err);
+          setError("Network error verifying certificate");
+        }
+      } else {
+         // No ID found to check
+         setVerificationResult(null);
+      }
+      setLoading(false);
+    };
+
+    fetchCertificate();
+  }, [id, manualData, extractedText]);
+
+  // Derived result object - Merging Backend Data with OCR
+  const dbMatch = verificationResult;
+  
   const result = {
-    status: (extractedText || manualData?.certId) ? "VERIFIED" : "PENDING",
-    confidence: extractedText ? 98.7 : (manualData ? 100 : 0),
-    certId: manualData?.certId || (parsedId !== "Not Detected" ? parsedId : (fileName ? `FILE hash: ${fileName.substring(0, 8)}...` : "Unknown")),
-    name: manualData?.name || (parsedName !== "Not Detected" ? parsedName : "Unknown Candidate"),
-    institute: manualData?.institute || (parsedInstitute !== "Not Detected" ? parsedInstitute : "Unknown Institute"),
-    year: manualData?.year || (parsedYear !== "Not Detected" ? parsedYear : new Date().getFullYear().toString()),
-    date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+    status: dbMatch ? "VERIFIED" : (extractedText ? "UNVERIFIED RECORD" : "PENDING"),
+    confidence: dbMatch ? 100 : (extractedText ? 85.0 : 0),
+    certId: dbMatch?.certificate_id || manualData?.certId || (parsedId !== "Not Detected" ? parsedId : "Unknown"),
+    name: dbMatch?.student_name || manualData?.name || (parsedName !== "Not Detected" ? parsedName : "Unknown Candidate"),
+    institute: dbMatch?.profiles?.name || manualData?.institute || (parsedInstitute !== "Not Detected" ? parsedInstitute : "Unknown Institute"),
+    year: dbMatch ? new Date(dbMatch.issue_date).getFullYear() : (manualData?.year || (parsedYear !== "Not Detected" ? parsedYear : new Date().getFullYear().toString())),
+    date: dbMatch ? new Date(dbMatch.issue_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
   };
 
   const handleDownload = () => {
@@ -70,9 +111,7 @@ Year of Issue: ${result.year}
 
 ANALYSIS
 --------
-The certificate matches our decentralized database records. 
-Digital signature verified. 
-Document integrity confirmed.
+${result.status === 'VERIFIED' ? "The certificate matches our decentralized database records. Digital signature verified. Document integrity confirmed." : "We extracted data from the document, but could not find a matching record in our official registry."}
 
 -----------------------------
 Verified by CertiSure Blockchain
@@ -96,12 +135,14 @@ Verified by CertiSure Blockchain
           className="bg-white rounded-2xl card-shadow overflow-hidden"
         >
           {/* Status Header */}
-          <div className="p-8 text-center text-white bg-gradient-to-br from-emerald-500 to-emerald-600">
+          <div className={`p-8 text-center text-white bg-gradient-to-br ${result.status === 'VERIFIED' ? 'from-emerald-500 to-emerald-600' : 'from-amber-500 to-orange-600'}`}>
             <div className="w-20 h-20 mx-auto mb-4 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm">
               <CheckCircle className="w-10 h-10 text-white" />
             </div>
             <h1 className="font-heading text-4xl font-bold mb-2">{result.status}</h1>
-            <p className="text-white/90">This certificate is authentic</p>
+            <p className="text-white/90">
+              {result.status === 'VERIFIED' ? 'This certificate is authentically verified' : 'Certificate details found but not verified in blockchain'}
+            </p>
           </div>
 
           {/* Details */}
@@ -134,6 +175,35 @@ Verified by CertiSure Blockchain
                   <span className={`font-medium ${item.value.includes("Unknown") || item.value.includes("Not Detected") ? "text-slate-400 italic" : "text-slate-900"}`}>{item.value}</span>
                 </div>
               ))}
+              
+              {/* Blockchain Details Section */}
+              {dbMatch?.metadata?.txHash && (
+                <div className="mt-6 pt-6 border-t border-slate-100">
+                    <h4 className="text-sm font-bold text-slate-900 mb-3 flex items-center gap-2">
+                        <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                        Blockchain Record
+                    </h4>
+                    <div className="space-y-3 text-xs font-mono bg-slate-50 p-4 rounded-xl border border-slate-200">
+                        <div>
+                            <span className="text-slate-500 block mb-1">Transaction Hash</span>
+                            <span className="text-violet-600 break-all">{dbMatch.metadata.txHash}</span>
+                        </div>
+                        <div className="flex justify-between">
+                            <div>
+                                <span className="text-slate-500 block mb-1">Block Number</span>
+                                <span className="text-slate-700">{dbMatch.metadata.blockNumber}</span>
+                            </div>
+                            <div>
+                                <span className="text-slate-500 block mb-1">Status</span>
+                                <span className="text-emerald-600 font-bold">CONFIRMED</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="mt-2 text-right">
+                         <a href="#" className="text-xs text-blue-500 hover:text-blue-700 hover:underline">View on Explorer ↗</a>
+                    </div>
+                </div>
+              )}
             </div>
 
             {/* AI Analysis / OCR Section */}
@@ -151,11 +221,15 @@ Verified by CertiSure Blockchain
                </div>
             )}
 
-            <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-xl mb-6 flex gap-3">
-              <FileText className="w-5 h-5 text-emerald-600 flex-shrink-0 mt-0.5" />
+            <div className={`p-4 border rounded-xl mb-6 flex gap-3 ${result.status === 'VERIFIED' ? 'bg-emerald-50 border-emerald-200' : 'bg-amber-50 border-amber-200'}`}>
+              <FileText className={`w-5 h-5 flex-shrink-0 mt-0.5 ${result.status === 'VERIFIED' ? 'text-emerald-600' : 'text-amber-600'}`} />
               <div>
-                <p className="font-medium text-emerald-800 mb-1">Analysis Summary</p>
-                <p className="text-sm text-emerald-700">The certificate matches our database records. Digital signature verified. Document integrity confirmed.</p>
+                <p className={`font-medium mb-1 ${result.status === 'VERIFIED' ? 'text-emerald-800' : 'text-amber-800'}`}>Analysis Summary</p>
+                <p className={`text-sm ${result.status === 'VERIFIED' ? 'text-emerald-700' : 'text-amber-700'}`}>
+                   {result.status === 'VERIFIED' 
+                     ? "The certificate matches our decentralized database records. Digital signature verified. Document integrity confirmed." 
+                     : "We extracted data from the document, but could not find a matching record in our official registry."}
+                </p>
               </div>
             </div>
 

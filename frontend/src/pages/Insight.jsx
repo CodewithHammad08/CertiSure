@@ -26,7 +26,11 @@ export const Insight = () => {
             <p className="text-slate-500">MIT University • Business Dashboard</p>
           </div>
           <div className="flex items-center gap-4">
-            <Button size="sm" className="bg-violet-600 hover:bg-violet-700 text-white border-none flex items-center gap-2">
+            <Button 
+                onClick={() => alert("Downloading Institute Report...")}
+                size="sm" 
+                className="bg-violet-600 hover:bg-violet-700 text-white border-none flex items-center gap-2"
+            >
                <Download size={16} /> Export Report
             </Button>
              <div className="w-10 h-10 rounded-full bg-white border border-slate-200 flex items-center justify-center">
@@ -60,7 +64,7 @@ export const Insight = () => {
             <Card className="glass-panel border-none">
               <div className="flex items-center justify-between mb-6">
                 <h3 className="font-heading font-bold text-lg text-slate-900">Recent Issuance Batches</h3>
-                <button className="text-sm text-violet-600 font-medium hover:text-violet-700">View All</button>
+                <button onClick={() => alert("Viewing all batches...")} className="text-sm text-violet-600 font-medium hover:text-violet-700">View All</button>
               </div>
               <div className="space-y-4">
                 {[
@@ -127,7 +131,10 @@ export const Insight = () => {
                       </ul>
                    </div>
 
-                   <button className="w-full py-3 bg-white text-violet-900 rounded-xl font-bold text-sm hover:bg-violet-50 transition-colors mt-4">
+                   <button 
+                        onClick={() => alert("Redirecting to Billing Portal...")}
+                        className="w-full py-3 bg-white text-violet-900 rounded-xl font-bold text-sm hover:bg-violet-50 transition-colors mt-4"
+                   >
                       Manage Subscription
                    </button>
                 </div>

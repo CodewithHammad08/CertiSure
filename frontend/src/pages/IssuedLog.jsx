@@ -23,10 +23,10 @@ export const IssuedLog = () => {
             <p className="text-slate-500">Track and manage all certificates issued on the blockchain</p>
           </div>
           <div className="flex gap-4">
-             <button className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 rounded-xl text-slate-600 hover:bg-slate-50 transition-colors">
+             <button onClick={() => alert("Filter modal opening...")} className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 rounded-xl text-slate-600 hover:bg-slate-50 transition-colors">
                 <Filter size={18} /> Filter
              </button>
-             <button className="flex items-center gap-2 px-4 py-2 bg-violet-600 text-white rounded-xl hover:bg-violet-700 transition-colors">
+             <button onClick={() => alert("Exporting CSV...")} className="flex items-center gap-2 px-4 py-2 bg-violet-600 text-white rounded-xl hover:bg-violet-700 transition-colors">
                 <Download size={18} /> Export CSV
              </button>
           </div>

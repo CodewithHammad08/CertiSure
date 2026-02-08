@@ -7,15 +7,33 @@ import { useAuth } from '../context/AuthContext';
 
 export const RegisterUser = () => {
   const [showPassword, setShowPassword] = useState(false);
-  const [focusedField, setFocusedField] = useState(null);
+  const [formData, setFormData] = useState({ name: '', email: '', password: '' });
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
   const { register } = useAuth();
   const navigate = useNavigate();
 
-  const handleRegister = (e) => {
+  const handleRegister = async (e) => {
     e.preventDefault();
-    // Simulate registration logic
-    register({ name: 'New User', email: 'user@example.com', role: 'user' });
-    navigate('/user-insight');
+    if (loading) return;
+    setError('');
+    setLoading(true);
+    try {
+      await register(formData.email, formData.password, 'user', formData.name);
+      navigate('/user-insight');
+    } catch (err) {
+      if (err.message.includes("rate limit")) {
+        setError("Too many signup attempts. Please wait a moment or use a different email.");
+      } else {
+        setError(err.message);
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   const containerVariants = {
@@ -66,9 +84,13 @@ export const RegisterUser = () => {
             <div className="relative group">
               <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-blue-500 transition-colors" />
               <input 
+                name="name"
+                value={formData.name}
+                onChange={handleChange}
                 type="text" 
                 className="w-full pl-12 pr-4 py-3 bg-white/50 border border-slate-200 rounded-xl focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all" 
                 placeholder="John Doe" 
+                required
               />
             </div>
           </motion.div>
@@ -78,9 +100,13 @@ export const RegisterUser = () => {
             <div className="relative group">
               <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-blue-500 transition-colors" />
               <input 
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
                 type="email" 
                 className="w-full pl-12 pr-4 py-3 bg-white/50 border border-slate-200 rounded-xl focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all" 
                 placeholder="you@example.com" 
+                required
               />
             </div>
           </motion.div>
@@ -90,9 +116,13 @@ export const RegisterUser = () => {
             <div className="relative group">
               <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-blue-500 transition-colors" />
               <input 
+                name="password"
+                value={formData.password}
+                onChange={handleChange}
                 type={showPassword ? "text" : "password"} 
                 className="w-full pl-12 pr-12 py-3 bg-white/50 border border-slate-200 rounded-xl focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all" 
                 placeholder="••••••••" 
+                required
               />
               <button 
                 type="button"
@@ -105,8 +135,9 @@ export const RegisterUser = () => {
           </motion.div>
 
           <motion.div variants={itemVariants} whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="pt-2">
-            <Button className="w-full justify-center py-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:shadow-lg hover:shadow-blue-500/30 text-lg font-bold border-none rounded-xl transition-all">
-              Create Account <ArrowRight size={20} className="ml-2" />
+            {error && <p className="text-red-500 text-sm text-center font-medium bg-red-50 p-2 rounded-lg">{error}</p>}
+            <Button disabled={loading} className="w-full justify-center py-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:shadow-lg hover:shadow-blue-500/30 text-lg font-bold border-none rounded-xl transition-all disabled:opacity-70 disabled:cursor-not-allowed">
+              {loading ? 'Creating Account...' : 'Create Account'} <ArrowRight size={20} className="ml-2" />
             </Button>
           </motion.div>
         </form>

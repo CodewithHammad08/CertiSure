@@ -1,0 +1,79 @@
+﻿
+> frontend@0.0.0 lint
+> eslint .
+
+
+C:\Users\Dell-Dxb\Desktop\CertiSure\frontend\src\components\layout\Navbar.jsx
+  4:10  error  'motion' is defined but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+C:\Users\Dell-Dxb\Desktop\CertiSure\frontend\src\components\layout\Sidebar.jsx
+  1:10  error  'motion' is defined but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+C:\Users\Dell-Dxb\Desktop\CertiSure\frontend\src\components\ui\Button.jsx
+  1:10  error  'motion' is defined but never used. Allowed unused vars must match /^[A-Z_]/u                                                   no-unused-vars
+  5:17  error  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+C:\Users\Dell-Dxb\Desktop\CertiSure\frontend\src\components\ui\Card.jsx
+  1:10  error  'motion' is defined but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+C:\Users\Dell-Dxb\Desktop\CertiSure\frontend\src\context\AuthContext.jsx
+  107:14  error  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+C:\Users\Dell-Dxb\Desktop\CertiSure\frontend\src\pages\Contact.jsx
+  1:10  error  'motion' is defined but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+C:\Users\Dell-Dxb\Desktop\CertiSure\frontend\src\pages\Dashboard.jsx
+  1:10  error  'motion' is defined but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+C:\Users\Dell-Dxb\Desktop\CertiSure\frontend\src\pages\Features.jsx
+  1:10  error  'motion' is defined but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+C:\Users\Dell-Dxb\Desktop\CertiSure\frontend\src\pages\GetStarted.jsx
+  1:10  error  'motion' is defined but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+C:\Users\Dell-Dxb\Desktop\CertiSure\frontend\src\pages\Home.jsx
+  1:10  error  'motion' is defined but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+C:\Users\Dell-Dxb\Desktop\CertiSure\frontend\src\pages\Insight.jsx
+  1:10  error  'motion' is defined but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+C:\Users\Dell-Dxb\Desktop\CertiSure\frontend\src\pages\IssueCertificate.jsx
+  1:10  error  'motion' is defined but never used. Allowed unused vars must match /^[A-Z_]/u   no-unused-vars
+  7:10  error  'useAuth' is defined but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+C:\Users\Dell-Dxb\Desktop\CertiSure\frontend\src\pages\IssuedLog.jsx
+  1:10  error  'motion' is defined but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+C:\Users\Dell-Dxb\Desktop\CertiSure\frontend\src\pages\LoginAdmin.jsx
+  1:10  error  'motion' is defined but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+C:\Users\Dell-Dxb\Desktop\CertiSure\frontend\src\pages\LoginUser.jsx
+  1:10  error  'motion' is defined but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+C:\Users\Dell-Dxb\Desktop\CertiSure\frontend\src\pages\RegisterInstitute.jsx
+  1:10  error  'motion' is defined but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+C:\Users\Dell-Dxb\Desktop\CertiSure\frontend\src\pages\RegisterUser.jsx
+   1:10  error  'motion' is defined but never used. Allowed unused vars must match /^[A-Z_]/u                    no-unused-vars
+  10:10  error  'focusedField' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u     no-unused-vars
+  10:24  error  'setFocusedField' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+C:\Users\Dell-Dxb\Desktop\CertiSure\frontend\src\pages\Result.jsx
+   1:10   error  'motion' is defined but never used. Allowed unused vars must match /^[A-Z_]/u            no-unused-vars
+  26:95   error  Unnecessary escape character: \.                                                         no-useless-escape
+  27:35   error  Unnecessary escape character: \.                                                         no-useless-escape
+  32:90   error  Unnecessary escape character: \.                                                         no-useless-escape
+  32:103  error  Unnecessary escape character: \-                                                         no-useless-escape
+  48:10   error  'loading' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+  49:10   error  'error' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u    no-unused-vars
+  55:92   error  Unnecessary escape character: \.                                                         no-useless-escape
+  55:105  error  Unnecessary escape character: \-                                                         no-useless-escape
+
+C:\Users\Dell-Dxb\Desktop\CertiSure\frontend\src\pages\UserInsight.jsx
+  1:10  error  'motion' is defined but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+C:\Users\Dell-Dxb\Desktop\CertiSure\frontend\src\pages\Verify.jsx
+  2:10  error  'motion' is defined but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+Ô£û 32 problems (32 errors, 0 warnings)
+

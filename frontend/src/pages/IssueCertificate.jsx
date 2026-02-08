@@ -3,8 +3,69 @@ import { Sidebar } from '../components/layout/Sidebar';
 import { Button } from '../components/ui/Button';
 import { Card } from '../components/ui/Card';
 import { Upload, FileText, Send, User, Calendar, Award } from 'lucide-react';
+import { useState } from 'react';
+import { supabase } from '../lib/supabaseClient';
 
 export const IssueCertificate = () => {
+  const [formData, setFormData] = useState({
+    candidateName: '',
+    courseName: '',
+    issueDate: '',
+    gradeGpa: '',
+    email: '',
+    studentId: ''
+  });
+  const [fileName, setFileName] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [status, setStatus] = useState({ type: '', message: '' });
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async () => {
+    setLoading(true);
+    setStatus({ type: '', message: '' });
+
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const token = session?.access_token;
+
+      if (!token) throw new Error("Not authenticated");
+
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/certificates/issue`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          candidateName: formData.candidateName,
+          courseName: formData.courseName,
+          issueDate: formData.issueDate,
+          metadata: { 
+            email: formData.email,
+            studentId: formData.studentId,
+            grade: formData.gradeGpa
+          }
+        })
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) throw new Error(data.error || 'Failed to issue certificate');
+
+      setStatus({ type: 'success', message: `Certificate Issued! ID: ${data.certificate.certificate_id}` });
+      setFormData({ candidateName: '', courseName: '', issueDate: '', gradeGpa: '', email: '', studentId: '' });
+
+    } catch (err) {
+      console.error(err);
+      setStatus({ type: 'error', message: err.message });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-slate-50 flex">
       <Sidebar role="institute" />
@@ -23,15 +84,15 @@ export const IssueCertificate = () => {
               <div className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-2">Student Name</label>
-                  <input type="text" placeholder="e.g., Jane Doe" className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 outline-none transition-all" />
+                  <input name="candidateName" value={formData.candidateName} onChange={handleChange} type="text" placeholder="e.g., Jane Doe" className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 outline-none transition-all" />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-2">Student ID / Reg No.</label>
-                  <input type="text" placeholder="e.g., MIT-2024-001" className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 outline-none transition-all" />
+                  <input name="studentId" value={formData.studentId} onChange={handleChange} type="text" placeholder="e.g., MIT-2024-001" className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 outline-none transition-all" />
                 </div>
                 <div>
                    <label className="block text-sm font-medium text-slate-700 mb-2">Email Address</label>
-                   <input type="email" placeholder="e.g., student@university.edu" className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 outline-none transition-all" />
+                   <input name="email" value={formData.email} onChange={handleChange} type="email" placeholder="e.g., student@university.edu" className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 outline-none transition-all" />
                 </div>
               </div>
             </Card>
@@ -43,16 +104,16 @@ export const IssueCertificate = () => {
                <div className="space-y-4">
                   <div>
                      <label className="block text-sm font-medium text-slate-700 mb-2">Degree / Course Name</label>
-                     <input type="text" placeholder="e.g., Bachelor of Computer Science" className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 outline-none transition-all" />
+                     <input name="courseName" value={formData.courseName} onChange={handleChange} type="text" placeholder="e.g., Bachelor of Computer Science" className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 outline-none transition-all" />
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                      <div>
                         <label className="block text-sm font-medium text-slate-700 mb-2">Issue Date</label>
-                        <input type="date" className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 outline-none transition-all" />
+                        <input name="issueDate" value={formData.issueDate} onChange={handleChange} type="date" className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 outline-none transition-all" />
                      </div>
                      <div>
                         <label className="block text-sm font-medium text-slate-700 mb-2">Grade / GPA</label>
-                        <input type="text" placeholder="e.g., 3.8/4.0" className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 outline-none transition-all" />
+                        <input name="gradeGpa" value={formData.gradeGpa} onChange={handleChange} type="text" placeholder="e.g., 3.8/4.0" className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 outline-none transition-all" />
                      </div>
                   </div>
                </div>
@@ -64,12 +125,22 @@ export const IssueCertificate = () => {
                 <h3 className="font-bold text-lg text-slate-900 mb-6 flex items-center gap-2">
                    <Upload className="w-5 h-5 text-violet-600" /> Certificate File
                 </h3>
-                <div className="border-2 border-dashed border-slate-300 rounded-2xl p-8 text-center hover:bg-slate-50 transition-colors cursor-pointer">
-                   <div className="w-16 h-16 bg-violet-100 text-violet-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                <div 
+                  onClick={() => document.getElementById('file-upload').click()}
+                  className="border-2 border-dashed border-slate-300 rounded-2xl p-8 text-center hover:bg-slate-50 transition-colors cursor-pointer group"
+                >
+                   <input 
+                      type="file" 
+                      id="file-upload" 
+                      className="hidden" 
+                      onChange={(e) => setFileName(e.target.files[0]?.name || '')}
+                      accept=".pdf,.jpg,.jpeg,.png"
+                   />
+                   <div className="w-16 h-16 bg-violet-100 text-violet-600 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
                       <FileText className="w-8 h-8" />
                    </div>
-                   <p className="font-medium text-slate-900">Upload Certificate PDF</p>
-                   <p className="text-sm text-slate-500 mt-1">Or drag and drop here</p>
+                   <p className="font-medium text-slate-900">{fileName ? fileName : "Upload Certificate PDF"}</p>
+                   <p className="text-sm text-slate-500 mt-1">{fileName ? "Click to change file" : "Or drag and drop here"}</p>
                 </div>
              </Card>
 
@@ -82,8 +153,13 @@ export const IssueCertificate = () => {
                    <span>Gas Fee Estimate</span>
                    <span className="font-mono font-bold">0.002 ETH</span>
                 </div>
-                <Button className="w-full bg-white text-violet-900 hover:bg-violet-50 border-none font-bold py-4">
-                   <Send className="w-4 h-4 mr-2" /> Issue Certificate
+                {status.message && (
+                  <div className={`p-4 rounded-xl mb-4 text-sm font-medium ${status.type === 'success' ? 'bg-green-500/20 text-green-200' : 'bg-red-500/20 text-red-200'}`}>
+                    {status.message}
+                  </div>
+                )}
+                <Button onClick={handleSubmit} disabled={loading} className="w-full bg-white text-violet-900 hover:bg-violet-50 border-none font-bold py-4 disabled:opacity-70 disabled:cursor-not-allowed">
+                   {loading ? <span className="flex items-center"><span className="animate-spin mr-2">⏳</span> Issuing...</span> : <span className="flex items-center"><Send className="w-4 h-4 mr-2" /> Issue Certificate</span>}
                 </Button>
              </Card>
           </div>

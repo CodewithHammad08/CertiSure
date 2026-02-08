@@ -26,7 +26,11 @@ export const Dashboard = () => {
             <p className="text-slate-500">Welcome back, Admin</p>
           </div>
           <div className="flex items-center gap-4">
-             <Button size="sm" className="bg-emerald-600 hover:bg-emerald-700 text-white border-none flex items-center gap-2">
+             <Button 
+                onClick={() => alert("Generating Report... \n(This is a simulated action)")}
+                size="sm" 
+                className="bg-emerald-600 hover:bg-emerald-700 text-white border-none flex items-center gap-2"
+             >
                 Export Report
              </Button>
              <div className="w-10 h-10 rounded-full bg-white border border-slate-200 flex items-center justify-center">
@@ -60,7 +64,7 @@ export const Dashboard = () => {
             <Card className="glass-panel border-none">
               <div className="flex items-center justify-between mb-6">
                 <h3 className="font-heading font-bold text-lg text-slate-900">Recent Activity</h3>
-                <button className="text-sm text-sky-600 font-medium hover:text-sky-700">View All</button>
+                <button onClick={() => alert("Opening full activity log...")} className="text-sm text-sky-600 font-medium hover:text-sky-700">View All</button>
               </div>
               <div className="space-y-4">
                 {[
@@ -125,7 +129,10 @@ export const Dashboard = () => {
 
                    <div className="pt-6 border-t border-slate-700">
                       <p className="text-xs text-slate-400 mb-4">Last system update: Today, 09:00 AM</p>
-                      <button className="w-full py-2 bg-white/10 hover:bg-white/20 rounded-lg text-sm font-medium transition-colors">
+                      <button 
+                        onClick={() => alert("System logs functionality will be available in the next update.")}
+                        className="w-full py-2 bg-white/10 hover:bg-white/20 rounded-lg text-sm font-medium transition-colors"
+                      >
                          View System Logs
                       </button>
                    </div>

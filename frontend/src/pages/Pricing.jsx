@@ -2,7 +2,10 @@ import { Check } from 'lucide-react';
 import { Button } from '../components/ui/Button';
 import { Card } from '../components/ui/Card';
 
+import { useNavigate } from 'react-router-dom';
+
 export const Pricing = () => {
+    const navigate = useNavigate();
   const plans = [
     {
       name: "Free Trial",
@@ -15,7 +18,7 @@ export const Pricing = () => {
     },
     {
       name: "Annual Plan",
-      price: "$299",
+      price: "$59",
       period: "/year",
       subtitle: "Best for growing institutions",
       popular: true,
@@ -25,7 +28,7 @@ export const Pricing = () => {
     },
     {
       name: "Lifetime Access",
-      price: "$999",
+      price: "$599",
       period: "/forever",
       subtitle: "One-time payment",
       features: ["Everything in Annual", "White-label option", "Dedicated account manager", "Custom integrations"],
@@ -80,6 +83,11 @@ export const Pricing = () => {
                   ? 'bg-white text-sky-600 hover:bg-sky-50 border-none' 
                   : 'bg-transparent border-2 border-slate-200 text-slate-700 hover:border-slate-300 hover:bg-slate-50'
               }`}
+              onClick={() => {
+                  if (plan.name === "Free Trial") navigate('/get-started');
+                  else if (plan.name === "Lifetime Access") navigate('/contact');
+                  else navigate('/get-started');
+              }}
             >
               {plan.buttonText}
             </Button>

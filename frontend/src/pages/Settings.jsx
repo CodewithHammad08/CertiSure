@@ -76,11 +76,11 @@ export const Settings = () => {
                          </div>
                       </div>
                       
-                      <div className="flex justify-end pt-4">
-                         <Button className="bg-slate-900 text-white">
-                            <Save className="w-4 h-4 mr-2" /> Save Changes
-                         </Button>
-                      </div>
+                       <div className="flex justify-end pt-4">
+                          <Button onClick={() => alert("Profile updated successfully!")} className="bg-slate-900 text-white">
+                             <Save className="w-4 h-4 mr-2" /> Save Changes
+                          </Button>
+                       </div>
                    </div>
                 )}
 
@@ -109,9 +109,9 @@ export const Settings = () => {
                          </div>
                       </div>
 
-                      <div className="flex justify-end pt-4">
-                         <Button className="bg-slate-900 text-white">Update Password</Button>
-                      </div>
+                       <div className="flex justify-end pt-4">
+                          <Button onClick={() => alert("Password update simulation complete.")} className="bg-slate-900 text-white">Update Password</Button>
+                       </div>
                    </div>
                 )}
 

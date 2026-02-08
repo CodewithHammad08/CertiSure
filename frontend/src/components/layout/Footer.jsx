@@ -19,8 +19,8 @@ export const Footer = () => {
           <div>
             <h3 className="text-slate-900 font-semibold mb-4">Platform</h3>
             <ul className="space-y-2 text-sm text-slate-500">
-              <li><Link to="#" className="hover:text-blue-600 transition-colors">Features</Link></li>
-              <li><Link to="#" className="hover:text-blue-600 transition-colors">Pricing</Link></li>
+              <li><Link to="/#features" className="hover:text-blue-600 transition-colors">Features</Link></li>
+              <li><Link to="/pricing" className="hover:text-blue-600 transition-colors">Pricing</Link></li>
               <li><Link to="#" className="hover:text-blue-600 transition-colors">Integrations</Link></li>
               <li><Link to="#" className="hover:text-blue-600 transition-colors">API</Link></li>
             </ul>
@@ -29,10 +29,19 @@ export const Footer = () => {
           <div>
             <h3 className="text-slate-900 font-semibold mb-4">Company</h3>
             <ul className="space-y-2 text-sm text-slate-500">
-              <li><Link to="#" className="hover:text-blue-600 transition-colors">About Us</Link></li>
+              <li><Link to="/#how-it-works" className="hover:text-blue-600 transition-colors">About Us</Link></li>
               <li><Link to="#" className="hover:text-blue-600 transition-colors">Careers</Link></li>
               <li><Link to="#" className="hover:text-blue-600 transition-colors">Blog</Link></li>
-              <li><Link to="#" className="hover:text-blue-600 transition-colors">Contact</Link></li>
+              <li><Link to="/contact" className="hover:text-blue-600 transition-colors">Contact</Link></li>
+            </ul>
+          </div>
+
+          <div>
+            <h3 className="text-slate-900 font-semibold mb-4">Account</h3>
+            <ul className="space-y-2 text-sm text-slate-500">
+              <li><Link to="/login-user" className="hover:text-blue-600 transition-colors">Sign In</Link></li>
+              <li><Link to="/get-started" className="hover:text-blue-600 transition-colors">Register</Link></li>
+              <li><Link to="/verify" className="hover:text-blue-600 transition-colors">Verify Certificate</Link></li>
             </ul>
           </div>
 

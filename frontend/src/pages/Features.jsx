@@ -6,7 +6,10 @@ import {
   Activity, Users, FileText 
 } from 'lucide-react';
 
+import { useNavigate } from 'react-router-dom';
+
 export const Features = () => {
+    const navigate = useNavigate();
   const features = [
     {
       icon: <Zap className="w-8 h-8 text-blue-600" />,
@@ -74,7 +77,7 @@ export const Features = () => {
 
       <div className="text-center mt-20">
         <h2 className="font-heading text-2xl font-bold mb-6 text-slate-900">Ready to experience the future?</h2>
-        <Button variant="glow" size="lg" onClick={() => window.location.href='/get-started'}>
+        <Button variant="glow" size="lg" onClick={() => navigate('/get-started')}>
           Get Started Now
         </Button>
       </div>

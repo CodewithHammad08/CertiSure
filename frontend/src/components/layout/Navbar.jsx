@@ -3,10 +3,12 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Menu, X, ShieldCheck } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '../ui/Button';
+import { useAuth } from '../../context/AuthContext';
 
 export const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const navigate = useNavigate();
+  const { user, logout } = useAuth(); // Get auth state
 
   const navLinks = [
     { name: 'How It Works', path: '/#how-it-works' },
@@ -59,11 +61,27 @@ export const Navbar = () => {
                 {link.name}
               </button>
             ))}
-            <Link to="/login-user">
-              <Button className="px-5 py-2.5 bg-slate-800 text-white rounded-lg font-medium text-sm hover:bg-slate-700 hover:shadow-lg transition-all border-none shadow-none">
-                Sign In
-              </Button>
-            </Link>
+            {user ? (
+              <div className="flex items-center gap-4">
+                 <Link to={user.role === 'institute' ? '/insight' : (user.role === 'admin' ? '/dashboard' : '/user-insight')}>
+                    <Button variant="ghost" className="text-slate-600 hover:text-slate-900 font-medium">Dashboard</Button>
+                 </Link>
+                 <Button onClick={logout} className="px-5 py-2.5 bg-slate-100 text-slate-700 hover:bg-slate-200 border-none rounded-lg font-medium text-sm transition-all shadow-none">
+                    Log Out
+                 </Button>
+              </div>
+            ) : (
+              <div className="flex items-center gap-4">
+                <Link to="/login-user">
+                  <span className="text-slate-600 hover:text-slate-900 font-medium text-sm cursor-pointer transition-colors">Log In</span>
+                </Link>
+                <Link to="/get-started">
+                  <Button className="px-5 py-2.5 bg-slate-800 text-white rounded-lg font-medium text-sm hover:bg-slate-700 hover:shadow-lg transition-all border-none shadow-none">
+                    Get Started
+                  </Button>
+                </Link>
+              </div>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
@@ -97,11 +115,31 @@ export const Navbar = () => {
                   {link.name}
                 </button>
               ))}
-              <Link to="/login-user" onClick={() => setIsOpen(false)} className="block mt-4">
-                <Button className="w-full justify-center bg-slate-800 hover:bg-slate-700 text-white border-none py-3">
-                  Sign In
-                </Button>
-              </Link>
+              {user ? (
+                <>
+                  <Link to={user.role === 'institute' ? '/insight' : (user.role === 'admin' ? '/dashboard' : '/user-insight')} onClick={() => setIsOpen(false)} className="block mt-4">
+                     <Button className="w-full justify-center bg-slate-100 text-slate-800 hover:bg-slate-200 border-none py-3">
+                        Dashboard
+                     </Button>
+                  </Link>
+                  <Button onClick={() => { logout(); setIsOpen(false); }} className="w-full justify-center mt-2 bg-red-50 text-red-600 hover:bg-red-100 border-none py-3">
+                     Log Out
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Link to="/login-user" onClick={() => setIsOpen(false)} className="block mt-4">
+                    <Button variant="outline" className="w-full justify-center border-slate-200 text-slate-700 py-3">
+                      Log In
+                    </Button>
+                  </Link>
+                  <Link to="/get-started" onClick={() => setIsOpen(false)} className="block mt-2">
+                    <Button className="w-full justify-center bg-slate-800 hover:bg-slate-700 text-white border-none py-3">
+                      Get Started
+                    </Button>
+                  </Link>
+                </>
+              )}
             </div>
           </motion.div>
         )}

@@ -1,10 +1,7 @@
 import { motion } from "framer-motion";
-import { clsx } from "clsx";
-import { twMerge } from "tailwind-merge";
+import { cn } from "../../lib/utils";
 
-export function cn(...inputs) {
-  return twMerge(clsx(inputs));
-}
+// Removed local cn function
 
 const variants = {
   primary: "bg-blue-600 text-white hover:bg-blue-700 shadow-md shadow-blue-500/20",

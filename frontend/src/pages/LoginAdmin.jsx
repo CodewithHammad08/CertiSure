@@ -4,23 +4,48 @@ import { Button } from '../components/ui/Button';
 import { Link, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { supabase } from '../lib/supabaseClient';
 
 export const LoginAdmin = () => {
-  const [showPassword, setShowPassword] = useState(false);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
   const [focusedField, setFocusedField] = useState(null);
+  const [showPassword, setShowPassword] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
+  // We need to import supabase to check role here if AuthContext doesn't provide it immediately
+  // But wait, we can just use the import from lib/supabaseClient
+  // We need to add the import at top of file
+  // For now, let's just use login and then fetch profile manually to be sure
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
-    const email = document.getElementById('email').value;
-    
-    if (email.includes('institute')) {
-       login({ name: 'Institute Admin', email: email, role: 'institute' });
-       navigate('/insight');
-    } else {
-       login({ name: 'System Admin', email: email, role: 'admin' });
-       navigate('/dashboard');
+    setError('');
+    setLoading(true);
+    try {
+      const { user } = await login(email, password);
+      
+      // Fetch role to decide where to go
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', user.id)
+        .single();
+      
+      if (profile?.role === 'institute') {
+         navigate('/insight');
+      } else if (profile?.role === 'admin') {
+         navigate('/dashboard');
+      } else {
+         setError("Access Denied: Not an admin/institute account");
+         // Optional: logout
+      }
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -74,10 +99,13 @@ export const LoginAdmin = () => {
               <input 
                 id="email"
                 type="email" 
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 onFocus={() => setFocusedField('email')}
                 onBlur={() => setFocusedField(null)}
                 className="w-full pl-12 pr-4 py-4 bg-white/50 border border-slate-200 rounded-xl focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 outline-none transition-all placeholder:text-slate-400" 
                 placeholder="admin@certisure.com" 
+                required
               />
             </div>
             <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} delay={1} className="text-xs text-slate-400 mt-2 ml-1">
@@ -91,10 +119,13 @@ export const LoginAdmin = () => {
               <Lock className={`absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 transition-colors ${focusedField === 'password' ? 'text-emerald-500' : 'text-slate-400'}`} />
               <input 
                 type={showPassword ? "text" : "password"} 
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
                 onFocus={() => setFocusedField('password')}
                 onBlur={() => setFocusedField(null)}
                 className="w-full pl-12 pr-12 py-4 bg-white/50 border border-slate-200 rounded-xl focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 outline-none transition-all placeholder:text-slate-400" 
                 placeholder="••••••••" 
+                required
               />
               <button 
                 type="button"
@@ -116,8 +147,9 @@ export const LoginAdmin = () => {
           </motion.div>
 
           <motion.div variants={itemVariants} whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-            <Button className="w-full justify-center py-4 bg-gradient-to-r from-emerald-500 to-teal-600 hover:shadow-lg hover:shadow-emerald-500/30 text-lg font-bold border-none rounded-xl transition-all">
-              Access Portal <ArrowRight size={20} className="ml-2" />
+            {error && <p className="text-red-500 text-sm text-center bg-red-50 p-2 rounded-lg">{error}</p>}
+            <Button disabled={loading} className="w-full justify-center py-4 bg-gradient-to-r from-emerald-500 to-teal-600 hover:shadow-lg hover:shadow-emerald-500/30 text-lg font-bold border-none rounded-xl transition-all disabled:opacity-70 disabled:cursor-not-allowed">
+              {loading ? 'Accessing Portal...' : 'Access Portal'} <ArrowRight size={20} className="ml-2" />
             </Button>
           </motion.div>
         </form>

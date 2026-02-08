@@ -6,15 +6,29 @@ import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 
 export const LoginUser = () => {
-  const [showPassword, setShowPassword] = useState(false);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
   const [focusedField, setFocusedField] = useState(null);
+  const [showPassword, setShowPassword] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
-    login({ name: 'Candidate User', email: 'user@example.com', role: 'user' });
-    navigate('/user-insight');
+    setError('');
+    setLoading(true);
+    try {
+      await login(email, password);
+      // For now, assume user role for this page, or let ProtectedRoute handle it?
+      // Better to check role if possible, but for simplicity:
+      navigate('/user-insight');
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const containerVariants = {
@@ -66,10 +80,13 @@ export const LoginUser = () => {
               <User className={`absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 transition-colors ${focusedField === 'email' ? 'text-blue-500' : 'text-slate-400'}`} />
               <input 
                 type="email" 
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 onFocus={() => setFocusedField('email')}
                 onBlur={() => setFocusedField(null)}
                 className="w-full pl-12 pr-4 py-4 bg-white/50 border border-slate-200 rounded-xl focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all placeholder:text-slate-400" 
                 placeholder="you@example.com" 
+                required
               />
             </div>
           </motion.div>
@@ -80,10 +97,13 @@ export const LoginUser = () => {
               <Lock className={`absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 transition-colors ${focusedField === 'password' ? 'text-blue-500' : 'text-slate-400'}`} />
               <input 
                 type={showPassword ? "text" : "password"} 
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
                 onFocus={() => setFocusedField('password')}
                 onBlur={() => setFocusedField(null)}
                 className="w-full pl-12 pr-12 py-4 bg-white/50 border border-slate-200 rounded-xl focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all placeholder:text-slate-400" 
                 placeholder="••••••••" 
+                required
               />
               <button 
                 type="button"
@@ -106,8 +126,9 @@ export const LoginUser = () => {
           </motion.div>
 
           <motion.div variants={itemVariants} whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-            <Button className="w-full justify-center py-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:shadow-lg hover:shadow-blue-500/30 text-lg font-bold border-none rounded-xl transition-all">
-              Sign In <ArrowRight size={20} className="ml-2" />
+            {error && <p className="text-red-500 text-sm text-center bg-red-50 p-2 rounded-lg">{error}</p>}
+            <Button disabled={loading} className="w-full justify-center py-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:shadow-lg hover:shadow-blue-500/30 text-lg font-bold border-none rounded-xl transition-all disabled:opacity-70 disabled:cursor-not-allowed">
+              {loading ? 'Signing In...' : 'Sign In'} <ArrowRight size={20} className="ml-2" />
             </Button>
           </motion.div>
         </form>

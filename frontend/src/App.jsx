@@ -71,6 +71,7 @@ function App() {
               </ProtectedRoute>
             } />
             <Route path="/result" element={<Result />} />
+            <Route path="/result/:id" element={<Result />} />
             <Route path="*" element={<div className="h-screen flex items-center justify-center text-2xl">404 - Page Not Found</div>} />
           </Routes>
         </main>
